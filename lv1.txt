@@ -18,7 +18,7 @@ begin
       m:=n;
       n:=r;
     end;
-  begin;
+  begin
     r:=1;
     call gcd;
     write(a*m);
