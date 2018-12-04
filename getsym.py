@@ -1,9 +1,9 @@
 from symbol import *
 # 读入源程序
+
 def getsym(filename):
     buffer = []
     idNum=0
-    numNum=0
     f = open(filename, 'r')
     lines = f.readlines()
     for line in lines:
@@ -22,6 +22,8 @@ def getsym(filename):
                 if word in KEYWORDS:
                     SYM.append(KEYWORDS[word])  # 是关键字
                     print(len(SYM)-1,'<%s,%d,->' % (word,KEYWORDS[word]))
+                elif word in OPERATORS:
+                    SYM.append(OPERATORS[word])
                 else:
                     SYM.append(ident)  # 是标识符
                     if word not in ID:
@@ -38,11 +40,8 @@ def getsym(filename):
                     i = i+1
                 word = ''.join(buffer)
                 SYM.append(number)
-                if word not in NUM:
-                    NUM[word]=numNum
-                    numNum=numNum+1
-                NUMi.append(word)
-                print(len(SYM)-1,'<%s,%d,%s>' % (word,number,NUM[word]))
+                NUM.append(int(word))
+                print(len(SYM)-1,'<%s,%d,%s>' % ('number',number,word))
                 buffer.clear()
             elif line[i] == ':' and i+1 < len(line) and line[i+1] == '=':
                 SYM.append(OPERATORS[':='])

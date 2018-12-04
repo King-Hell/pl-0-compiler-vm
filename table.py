@@ -1,5 +1,7 @@
 from enum import Enum
 KIND=Enum('KIND',('CONSTANT','VARIABLE','PROCEDURE'))
+isConst=False
+isVar=True
 class Table:
     def __init__(self,parent=None):
         self.parent=parent
@@ -15,16 +17,32 @@ class Table:
             print(entry.name+' 重定义')
             return
         entry.level=self.level
-        if entry.kind!=KIND.CONSTANT:
+        if entry.kind==KIND.VARIABLE:
             entry.adr=self.dx
             self.dx+=1
         self.entries[entry.name]=entry
 
+    def getSize(self):
+        return self.dx
+
+    def find(self,name):#当标识符是变量时返回层差和地址Flag=1，当标识符是常量时返回层差和值Flag=0
+        if name in self.entries:
+            if self.entries[name].adr==None:#是常量
+                return (0,self.entries[name].val,isConst)
+            else:
+                return (0,self.entries[name].adr,isVar)
+        elif self.parent==None:
+            print('错误，未定义的标识符')
+            exit(-1)
+        else:
+            (l,a,flag)=self.parent.find(name)
+            return (1+l,a,flag)
+
     def __str__(self):
-        msg='________________________________________\n'
+        msg='___________________________________________________________\n'
         for i in self.entries.keys():
             msg+=self.entries[i].__str__()+'\n'
-        msg+='________________________________________'
+        msg+='___________________________________________________________'
         return msg
 
 class Entry:
