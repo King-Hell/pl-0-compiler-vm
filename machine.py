@@ -87,9 +87,9 @@ class Machine:
                 self.P.set(inst.a)
             elif inst.f==FUN.JPC:#条件转移指令，当栈顶的布尔值为非真时，转向a 域的地址，否则顺序执行。
                 if self.pop()==0:#为假
-                    self.P.inc()            
+                    self.P.set(inst.a)       
                 else:#为真
-                    self.P.set(inst.a)
+                    self.P.inc()
             elif inst.f==FUN.OPR:#关系和算术运算。具体操作由a 域给出。运算对象为栈顶和次顶的内容进行运算，结果存放在次顶。a 域为0 时是退出数据区。
                 if inst.a==OPERATORS['+']:#加法
                     b=self.pop()

@@ -345,8 +345,9 @@ def R(parent,table):#<条件语句>
         child.add(Node('if')) 
         advance()
         K(child,table)
-        code.append(Code('JPC',0,len(code)+2))
-        ret=Code('JMP',0,None)
+        #code.append(Code('JPC',0,len(code)+2))
+        #ret=Code('JMP',0,None)
+        ret=Code('JPC',0,None)
         code.append(ret)
         if SYM[p] == KEYWORDS['then']:
             child.add(Node('then')) 
@@ -384,8 +385,9 @@ def T(parent,table):#<当型循环语句>
         advance()
         ret=len(code)
         K(child,table)
-        code.append(Code('JPC',0,len(code)+2))
-        fret=Code('JMP',0,None)
+        #code.append(Code('JPC',0,len(code)+2))
+        #fret=Code('JMP',0,None)
+        fret=Code('JPC',0,None)
         code.append(fret)
         if SYM[p] == KEYWORDS['do']:
             child.add(Node('do'))
