@@ -1,3 +1,5 @@
 编译原理复习几套题
 __pycache__
-publish
+*.spec
+table.txt
+release/build
