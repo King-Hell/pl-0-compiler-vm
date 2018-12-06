@@ -345,8 +345,6 @@ def R(parent,table):#<条件语句>
         child.add(Node('if')) 
         advance()
         K(child,table)
-        #code.append(Code('JPC',0,len(code)+2))
-        #ret=Code('JMP',0,None)
         ret=Code('JPC',0,None)
         code.append(ret)
         if SYM[p] == KEYWORDS['then']:
@@ -370,6 +368,9 @@ def S(parent,table):#<过程调用语句>
             name=X(child,table)
             advance()
             (l,a,flag)=table.find(name)
+            if l>1:#当调用超出范围时出错
+                print('非法的过程调用')
+                exit(-1)
             code.append(Code('CAL',l,a))
         else:
             error()
@@ -385,8 +386,6 @@ def T(parent,table):#<当型循环语句>
         advance()
         ret=len(code)
         K(child,table)
-        #code.append(Code('JPC',0,len(code)+2))
-        #fret=Code('JMP',0,None)
         fret=Code('JPC',0,None)
         code.append(fret)
         if SYM[p] == KEYWORDS['do']:

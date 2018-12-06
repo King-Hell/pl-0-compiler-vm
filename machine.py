@@ -63,19 +63,23 @@ class Machine:
             elif inst.f==FUN.LOD:#将变量放到栈顶。a 域为变量在所说明层中的相对位置，l 为调用层与说明层的层差值。
                 badr=self.B.get()
                 for i in range(0,inst.l):
-                    badr=self.data[badr+1]
+                    badr=self.data[badr+2]
                 self.push(self.data[badr+inst.a])
                 self.P.inc()
             elif inst.f==FUN.STO:#将栈顶的内容送到某变量单元中。a,l 域的含义与LOD 的相同。
                 badr=self.B.get()
                 for i in range(0,inst.l):
-                    badr=self.data[badr+1]
+                    badr=self.data[badr+2]
                 self.data[badr+inst.a]=self.pop()
                 self.P.inc()
-            elif inst.f==FUN.CAL:#调用过程的指令。a 为被调用过程的目标程序的入中地址，l 为层差。 
+            elif inst.f==FUN.CAL:#调用过程的指令。a 为被调用过程的目标程序的入中地址，l 为层差。
+                if inst.l==0:#子过程调用,新过程的静态链为旧过程
+                    sl=self.data[self.B.get()]
+                else:#同级过程调用,新过程的静态链为旧过程的动态链
+                    sl=self.data[self.B.get()+2]
                 self.data.append(self.P.get())#设定返回地址
                 self.data.append(self.B.get())#设定动态链
-                self.data.append(None)#设定静态链
+                self.data.append(sl)#设定静态链
                 self.P.set(inst.a)#设定入口地址
                 self.B.set(self.B+self.T+1)#设置基址寄存器
                 self.T.set(3)#设置栈指针寄存器
@@ -158,7 +162,7 @@ class Machine:
                 elif inst.a==OPERATORS['write']:#写
                     print('output:'+str(self.pop()))
                 elif inst.a==0:#退出数据区
-                    badr=self.data[self.B.get()+1]
+                    badr=self.data[self.B.get()+1]#获取静态链
                     self.P.set(self.data[self.B.get()])#恢复返回地址
                     while len(self.data)>self.B.get():#退栈
                         self.data.pop()
