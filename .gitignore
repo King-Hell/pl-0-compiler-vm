@@ -1,5 +1,7 @@
 编译原理复习几套题
 __pycache__
-*.spec
 table.txt
+*.spec
+*.litong
+test.*
 release/build
