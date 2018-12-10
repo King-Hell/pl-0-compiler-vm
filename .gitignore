@@ -3,5 +3,5 @@ __pycache__
 table.txt
 *.spec
 *.litong
-test.*
+test.py
 release/build

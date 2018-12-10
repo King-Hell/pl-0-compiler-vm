@@ -47,7 +47,10 @@ class Machine:
 
     def debug(self,info):
         if self.debugFlag:
+            print('*********************************************************')
             print(info)
+            print('P=',self.P.get(),'B=',self.B.get(),'T=',self.T.get())
+            print(self.data)
 
     def run(self):
         self.debug('开始运行')
@@ -56,33 +59,35 @@ class Machine:
             addr=self.P.get()#获取地址
             inst=self.code[addr]
             self.I.set(inst)#读指令
-            self.debug('Addr:'+str(addr)+'\t|\tInst:'+str(inst))
             if inst.f==FUN.LIT:#将常数放到运栈顶，a 域为常数。
                 self.push(inst.a)
                 self.P.inc()
             elif inst.f==FUN.LOD:#将变量放到栈顶。a 域为变量在所说明层中的相对位置，l 为调用层与说明层的层差值。
                 badr=self.B.get()
-                for i in range(0,inst.l):
-                    badr=self.data[badr+2]
+                #print(inst.l)
+                if inst.l>0:
+                    for _ in range(1,inst.l+1):
+                        badr=self.data[badr+2]
                 self.push(self.data[badr+inst.a])
                 self.P.inc()
             elif inst.f==FUN.STO:#将栈顶的内容送到某变量单元中。a,l 域的含义与LOD 的相同。
                 badr=self.B.get()
-                for i in range(0,inst.l):
-                    badr=self.data[badr+2]
+                if inst.l>0:
+                    for _ in range(1,inst.l+1):
+                        badr=self.data[badr+2]
                 self.data[badr+inst.a]=self.pop()
                 self.P.inc()
             elif inst.f==FUN.CAL:#调用过程的指令。a 为被调用过程的目标程序的入中地址，l 为层差。
                 if inst.l==0:#子过程调用,新过程的静态链为旧过程
-                    sl=self.data[self.B.get()]
-                else:#同级过程调用,新过程的静态链为旧过程的动态链
+                    sl=self.B.get()
+                else:#同级过程调用,新过程的静态链为旧过程的静态链
                     sl=self.data[self.B.get()+2]
                 self.data.append(self.P.get())#设定返回地址
                 self.data.append(self.B.get())#设定动态链
                 self.data.append(sl)#设定静态链
                 self.P.set(inst.a)#设定入口地址
                 self.B.set(self.B+self.T+1)#设置基址寄存器
-                self.T.set(3)#设置栈指针寄存器
+                self.T.set(2)#设置栈指针寄存器
             elif inst.f==FUN.INT:#为被调用的过程（或主程序）在运行栈中开辟数据区。a 域为开辟的个数。
                 while len(self.data)<self.B.get()+inst.a:
                     self.push(0)
@@ -146,7 +151,7 @@ class Machine:
                         self.push(1)   
                     else:
                         self.push(0) 
-                elif inst.a==OPERATORS['>=']:#判断奇数
+                elif inst.a==OPERATORS['odd']:#判断奇数
                     a=self.pop()
                     if a%2==1:
                         self.push(1)   
@@ -162,10 +167,11 @@ class Machine:
                 elif inst.a==OPERATORS['write']:#写
                     print('output:'+str(self.pop()))
                 elif inst.a==0:#退出数据区
-                    badr=self.data[self.B.get()+1]#获取静态链
+                    badr=self.data[self.B.get()+1]#获取动态链
                     self.P.set(self.data[self.B.get()])#恢复返回地址
                     while len(self.data)>self.B.get():#退栈
                         self.data.pop()
                     self.T.set(self.B.get()-1)#恢复栈指针寄存器
                     self.B.set(badr)#恢复基址寄存器
                 self.P.inc()
+            self.debug('Addr:'+str(addr)+'\t|\tInst:'+str(inst))

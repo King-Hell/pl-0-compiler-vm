@@ -11,6 +11,7 @@ code=[]#CODE数组
 startCode=Code('JMP',0,None)
 code.append(startCode)
 code.append(Code)
+tableList=[]
 def error():  # 出错
     print("Error:",p)
     exit(-1)
@@ -22,6 +23,7 @@ def advance():
     
 
 def block():
+    tableList.append(table)
     A(root,table)
 
 
@@ -39,7 +41,7 @@ def A(root,table):#<程序>
         error()
 
 
-def B(parent,table):#<分程序>
+def B(parent,table,enrty=None):#<分程序>
     child=Node('<分程序>')
     parent.add(child)
     C(child,table)
@@ -47,6 +49,8 @@ def B(parent,table):#<分程序>
     if SYM[p] == KEYWORDS['procedure']:
         F(child,table)
     startAddr=len(code)
+    if enrty!=None:
+        enrty.adr=startAddr
     code.append(Code('INT',0,table.getSize()))
     H(child,table) 
     code.append(Code('OPR',0,0))
@@ -125,8 +129,10 @@ def E(parent,table):#<变量说明部分>
 def F(parent,table):#<过程说明部分>
     child=Node('<过程说明部分>')
     parent.add(child)
-    childTable=G(child,table)
-    B(child,childTable)
+    (childTable,entry)=G(child,table)
+    tableList.append(childTable)
+    B(child,childTable,entry)
+    #table.entries[name].adr=len(code)
     if SYM[p] == DELIMITERS[';']:
         child.add(Node(';'))
         advance()
@@ -146,13 +152,12 @@ def G(parent,table):#<过程首部>
             name=X(child,table)
             entry=Entry(name,KIND.PROCEDURE)
             table.add(entry)
-            table.entries[name].adr=len(code)
             childTable=Table(table)
             advance()
             if SYM[p]==DELIMITERS[';']:
                 child.add(Node(';'))
                 advance()
-                return childTable
+                return childTable,entry
             else:
                 error()
         else:
@@ -367,7 +372,7 @@ def S(parent,table):#<过程调用语句>
         if SYM[p] == ident:
             name=X(child,table)
             advance()
-            (l,a,flag)=table.find(name)
+            (l,a,_)=table.find(name)
             if l>1:#当调用超出范围时出错
                 print('非法的过程调用')
                 exit(-1)

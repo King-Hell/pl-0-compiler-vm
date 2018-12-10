@@ -1,6 +1,6 @@
 import pickle
 from machine import Machine
-version=0.2
+version=0.3
 print('Pl/0虚拟机,version:',version)
 filename=input('请输入要执行的文件:')
 with open(filename,'rb') as fp:

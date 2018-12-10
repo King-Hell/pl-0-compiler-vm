@@ -1,7 +1,7 @@
 from getsym import getsym
 from block import block,table,code
 import pickle
-version=0.2
+version=0.3
 print('Pl/0编译器,version:',version)
 filename=input('请输入要编译的文件名:')
 with open(filename,'r') as fp:
